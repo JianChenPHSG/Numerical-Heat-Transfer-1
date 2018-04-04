@@ -145,3 +145,25 @@ WRITE(1,*) X(i)
 END DO
 RETURN
 END SUBROUTINE 
+
+
+! 标准TDMA算法，还没有加入到里面，需要确定一下
+!TRI-DIAGONAL SOLUTION ALGORITHM
+!NOTE ARRAYS B AND D ARE DESTROYED IN THE PROCESS.
+!FOR THE SOLUTION OF:     -C*T(I-1) + A*T(I) - B*T(I+1) = D
+SUBROUTINE TDMA(A,B,C,D,N,X)
+	IMPLICIT REAL*8 (A-H,O-Z)
+	REAL*8 A(1),B(1),C(1),D(1),X(1)
+	B(1)=B(1)/A(1)
+	D(1)=D(1)/A(1)
+	DO I = 2 , N
+	    B(I)=B(I)/(A(I)-C(I)*B(I-1))
+	    D(I)=(D(I)+C(I)*D(I-1))/(A(I)-C(I)*B(I-1))
+     ENDDO
+	X(N)=D(N)
+	DO I = N-1 , 1 , -1                          !step size = -1
+	    X(I)=B(I)*X(I+1)+D(I)
+     ENDDO
+	RETURN
+	END
+
