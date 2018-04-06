@@ -20,6 +20,7 @@ CALL Upwind_D(N,Velo)
 IF (Velo==2.5) THEN
 CALL Mixed_D(N,Velo)
 END IF
+CALL Analytic_Sol(N,Velo)
 Pause
 END PROGRAM Teamwork1             
  
@@ -278,7 +279,27 @@ END DO
 RETURN
 END SUBROUTINE 
 
+!Analysic Solution
+SUBROUTINE Analytic_Sol(N,Velo)
+REAL::Velo
+INTEGER::N
+REAL::Len=1,Dens=1,Gama=0.1,Delta_x
+REAL,ALLOCATABLE::X(:)
+Delta_x=Len/N
+ALLOCATE(X(N+2))
 
+X(1)=1
+X(N+2)=0;
+DO i=2,N+1,1
+X(i)=-1*(EXP(Dens*Velo*(i-1.5)*Delta_x/Gama)-1)/(EXP(Dens*Velo*Len/Gama)-1)+1
+END DO
+OPEN(UNIT=1,FILE='Analysic_Sol.txt')
+DO i=1,N+2,1
+WRITE(1,*) X(i)
+END DO
+
+RETURN
+END SUBROUTINE 
 
 ! 标准TDMA算法，还没有加入到里面，需要确定一下
 !TRI-DIAGONAL SOLUTION ALGORITHM
