@@ -15,7 +15,6 @@ WRITE(*,*)'INPUT THE INLET VELOCITY'
 READ(*,*)Velo
 
 CALL Center_D(N,Velo)
-CALL Exp_D(N,Velo)
 CALL Upwind_D(N,Velo)
 IF (Velo==2.5) THEN
 CALL Mixed_D(N,Velo)
