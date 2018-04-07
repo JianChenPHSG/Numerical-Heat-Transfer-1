@@ -238,6 +238,30 @@ RETURN
 END SUBROUTINE 
 
 
+!Analysic Solution
+!edit by mayugao
+!和刘倩讨论后合并
+SUBROUTINE Analytic_solutions(N,Velo)
+REAL::Velo
+INTEGER::N
+REAL::Len=1,Dens=1,Gama=0.1,Delta_x,P,Fi_L=0,Fi_0=1
+REAL,ALLOCATABLE::X(:)
+ALLOCATE(X(N+2))
+
+Delta_x=Len/N
+P=Dens*Velo*Len/Gama;
+
+DO i=1,N,1
+X(i)=(Fi_L-Fi_0)*(EXP(P*(real(i)-0.5)/N)-1)/(EXP(P)-1)+Fi_0;
+END DO
+OPEN(UNIT=1,FILE='Analysic_Sol.txt')
+DO i=1,N,1
+WRITE(1,*) X(i)
+END DO
+
+RETURN
+END SUBROUTINE 
+
 
 !Center Format
 !mayugao edit
@@ -301,6 +325,9 @@ WRITE(1,*) X(i)
 END DO
 RETURN
 END SUBROUTINE 
+
+
+
 
 ! TDMA算法
 ! TRI-DIAGONAL SOLUTION ALGORITHM
