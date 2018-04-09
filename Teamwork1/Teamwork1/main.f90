@@ -310,7 +310,7 @@ END SUBROUTINE
 ! TDMA算法
 ! TRI-DIAGONAL SOLUTION ALGORITHM
 ! NOTE: ARRAYS B AND D ARE DESTROYED IN THE PROCESS.
-! FOR THE SOLUTION OF:     -C*T(I-1) + A*T(I) - B*T(I+1) = D
+! FOR THE SOLUTION OF:     -A_w*T(I-1) + A_p*T(I) - A_e*T(I+1) = A_c
 ! 改编自柯道友老师的讲解版本
 ! 可运行
 SUBROUTINE TDMA(A_p,A_e,A_w,A_c,N,X)
@@ -333,7 +333,7 @@ END SUBROUTINE
 
 ! A_p*T(I) = A_w*T(I-1)+A_e*T(I+1)+A_c
 ! TDMA求解方程
-! 可运行，无差别
+! 可运行，接口和运行结果和上面的TMDA（）无差别
 SUBROUTINE TDMA2(A_p,A_e,A_w,A_c,N,X)
     INTEGER::N
     REAL :: A_e(N),A_p(N),A_w(N),X(N),A_c(N),c_(N),d_(N)
