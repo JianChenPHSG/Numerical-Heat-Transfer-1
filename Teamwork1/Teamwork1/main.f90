@@ -1,7 +1,7 @@
 ! -------------------------------------------------------
 ! Campare Discrete Format:Exponential format
 ! Group1
-! 2018.4.30
+! 2018.4.9
 ! -------------------------------------------------------
 
 PROGRAM Teamwork1
@@ -13,7 +13,7 @@ WRITE(*,*) 'INPUT THE NUMBER OF CELLS'
 READ(*,*)N
 WRITE(*,*)'INPUT THE INLET VELOCITY'
 READ(*,*)Velo
-
+CALL Center_Format(N,Velo)
 CALL Center_D(N,Velo)
 CALL Upwind_D(N,Velo)
 IF (Velo==2.5) THEN
@@ -34,7 +34,7 @@ REAL,ALLOCATABLE::A_e(:),A_p(:),A_w(:),X(:),Y(:),A(:),B(:),C(:),L(:),U(:),K(:)
 ALLOCATE(A_e(N))
 ALLOCATE(A_p(N))
 ALLOCATE(A_w(N))
-ALLOCATE(X(N+1))
+ALLOCATE(X(N))
 ALLOCATE(Y(N))
 ALLOCATE(A(N))
 ALLOCATE(B(N))
@@ -46,29 +46,42 @@ Delta_x=Len/N
 D=Gama/Delta_x
 F=Dens*Velo 
 
-DO i=2,N,1
-!中心差分的系数
+!the coefficient for the left node
+A_e(1)=D-F/2
+!A_w(1)=2*D+F
+A_w(1)=0
+A_p(1)=3*D+F/2
+
+!the coefficient for the middle nodes
+DO i=2,N-1,1
 A_e(i)=D-F/2
 A_w(i)=D+F/2
 A_p(i)=A_e(i)+A_w(i)
+END DO
 
+!the coefficient for the right node
+!A_e(N)=2*D-F
+A_e(N)=0
+A_w(N)=D+F/2  
+A_p(N)=3*D-F/2
+
+DO i=1,N,1
 A(i)=-A_w(i)
 B(i)=A_p(i)
 C(i)=-A_e(i)  
 L(i)=B(i)
 U(i)=C(i)
 END DO
+!left boundary
+Y(1)=(2*D+F)*1
+!right boundary
+Y(N)=(2*D-F)*0
 
-X(1)=1
-X(N+1)=0
-Y(2)=A_w(2)*X(1)
-Y(N)=A_e(N)*X(N+1)
-
-DO i=3,N-1,1
+DO i=2,N-1,1
 Y(i)=0
 END DO
 
-DO i=2,N-1,1
+DO i=1,N-1,1
 K(i)=A(i+1)/L(i)
 L(i+1)=L(i+1)-U(i)*K(i)
 Y(i+1)=Y(i+1)-Y(i)*K(i)
@@ -76,16 +89,16 @@ END DO
 
 X(N)=Y(N)/L(N)
 
-DO i=N-1,2,-1
+DO i=N-1,1,-1
 X(i)=(Y(i)-U(i)*X(i+1))/L(i)
 END DO
 
 OPEN(UNIT=1,FILE='Center_D.txt')
-DO i=1,N+1,1
+DO i=1,N,1
 WRITE(1,*) X(i)
 END DO
-RETURN
-END SUBROUTINE 
+!RETURN
+END SUBROUTINE
 
 
 !Upwind Format
@@ -212,7 +225,7 @@ RETURN
 END SUBROUTINE 
 
 
-!Analysic Solution
+!Analytic Solution
 !edit by mayugao
 !和刘倩讨论后合并
 SUBROUTINE Analytic_solutions(N,Velo)
@@ -228,7 +241,7 @@ P=Dens*Velo*Len/Gama;
 DO i=1,N,1
 X(i)=(Fi_L-Fi_0)*(EXP(P*(real(i)-0.5)/N)-1)/(EXP(P)-1)+Fi_0;
 END DO
-OPEN(UNIT=1,FILE='Analysic_Sol.txt')
+OPEN(UNIT=1,FILE='Analytic_Solution.txt')
 DO i=1,N,1
 WRITE(1,*) X(i)
 END DO
@@ -262,24 +275,15 @@ F=Dens*Velo
 !以下是马誉高推导的边界条件
 A_e(1)=D-F/2
 A_w(1)=0
-A_p(1)=D+3*F/2
+A_p(1)=3*D+F/2
 A_c(1)=(F+2*D)
+
 
 A_e(N)=0
 A_w(N)=D+F/2
-A_p(N)=3*D+F/2
+A_p(N)=3*D-F/2
 A_c(N)=0
 
-!以下是冯夷宁组的边界条件
-!A_e(1)=(D-F/2)
-!A_w(1)=0
-!A_p(1)=2*D
-!A_c(1)=(D+F/2)
-
-!A_e(N)=0
-!A_w(N)=(D+F/2)
-!A_p(N)=2*D
-!A_c(N)=0
 
 DO i=2,N-1,1
 !中心差分的系数
@@ -293,7 +297,7 @@ END DO
 call TDMA(A_p,A_e,A_w,A_c,N,X)
 write(*,*) A_p,A_e,A_w,A_c,N,X
 
-OPEN(UNIT=1,FILE='Center_D.txt')
+OPEN(UNIT=1,FILE='Center_Format.txt')
 DO i=1,N,1
 WRITE(1,*) X(i)
 END DO
@@ -329,7 +333,6 @@ END SUBROUTINE
 
 ! A_p*T(I) = A_w*T(I-1)+A_e*T(I+1)+A_c
 ! TDMA求解方程
-! 改编自冯夷宁版本
 ! 可运行，无差别
 SUBROUTINE TDMA2(A_p,A_e,A_w,A_c,N,X)
     INTEGER::N
