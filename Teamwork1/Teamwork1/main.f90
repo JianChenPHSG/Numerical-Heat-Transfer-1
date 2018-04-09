@@ -16,9 +16,9 @@ READ(*,*)Velo
 CALL Center_Format(N,Velo)
 CALL Center_D(N,Velo)
 CALL Upwind_D(N,Velo)
-IF (Velo==2.5) THEN
-!CALL Mixed_D(N,Velo)
-END IF
+!IF (Velo==2.5) THEN
+! CALL Mixed_D(N,Velo)
+!END IF
 CALL Analysic_Sol(N,Velo)
 CALL Analytic_solutions(N,Velo)
 Pause
@@ -48,7 +48,6 @@ F=Dens*Velo
 
 !the coefficient for the left node
 A_e(1)=D-F/2
-!A_w(1)=2*D+F
 A_w(1)=0
 A_p(1)=3*D+F/2
 
@@ -60,7 +59,6 @@ A_p(i)=A_e(i)+A_w(i)
 END DO
 
 !the coefficient for the right node
-!A_e(N)=2*D-F
 A_e(N)=0
 A_w(N)=D+F/2  
 A_p(N)=3*D-F/2
@@ -97,7 +95,7 @@ OPEN(UNIT=1,FILE='Center_D.txt')
 DO i=1,N,1
 WRITE(1,*) X(i)
 END DO
-!RETURN
+RETURN
 END SUBROUTINE
 
 
@@ -142,7 +140,6 @@ END DO
 
 
 call TDMA(A_p,A_e,A_w,A_c,N,X)
-write(*,*) A_p,A_e,A_w,A_c,N,X
 
 OPEN(UNIT=1,FILE='Upwind_D.txt')
 DO i=1,N,1
@@ -272,7 +269,6 @@ Delta_x=Len/N
 D=Gama/Delta_x
 F=Dens*Velo 
 
-!以下是马誉高推导的边界条件
 A_e(1)=D-F/2
 A_w(1)=0
 A_p(1)=3*D+F/2
@@ -295,7 +291,6 @@ END DO
 
 
 call TDMA(A_p,A_e,A_w,A_c,N,X)
-write(*,*) A_p,A_e,A_w,A_c,N,X
 
 OPEN(UNIT=1,FILE='Center_Format.txt')
 DO i=1,N,1
