@@ -33,7 +33,7 @@ REAL,ALLOCATABLE::A_e(:),A_p(:),A_w(:),X(:),Y(:),A(:),B(:),C(:),L(:),U(:),K(:)
 ALLOCATE(A_e(N))
 ALLOCATE(A_p(N))
 ALLOCATE(A_w(N))
-ALLOCATE(X(N+1))
+ALLOCATE(X(N))
 ALLOCATE(Y(N))
 ALLOCATE(A(N))
 ALLOCATE(B(N))
@@ -45,29 +45,42 @@ Delta_x=Len/N
 D=Gama/Delta_x
 F=Dens*Velo 
 
-DO i=2,N,1
-!中心差分的系数
+!the coefficient for the left node
+A_e(1)=D-F/2
+!A_w(1)=2*D+F
+A_w(1)=0
+A_p(1)=3*D+F/2
+
+!the coefficient for the middle nodes
+DO i=2,N-1,1
 A_e(i)=D-F/2
 A_w(i)=D+F/2
 A_p(i)=A_e(i)+A_w(i)
+END DO
 
+!the coefficient for the right node
+!A_e(N)=2*D-F
+A_e(N)=0
+A_w(N)=D+F/2  
+A_p(N)=3*D-F/2
+
+DO i=1,N,1
 A(i)=-A_w(i)
 B(i)=A_p(i)
 C(i)=-A_e(i)  
 L(i)=B(i)
 U(i)=C(i)
 END DO
+!left boundary
+Y(1)=(2*D+F)*1
+!right boundary
+Y(N)=(2*D-F)*0
 
-X(1)=1
-X(N+1)=0
-Y(2)=A_w(2)*X(1)
-Y(N)=A_e(N)*X(N+1)
-
-DO i=3,N-1,1
+DO i=2,N-1,1
 Y(i)=0
 END DO
 
-DO i=2,N-1,1
+DO i=1,N-1,1
 K(i)=A(i+1)/L(i)
 L(i+1)=L(i+1)-U(i)*K(i)
 Y(i+1)=Y(i+1)-Y(i)*K(i)
@@ -75,16 +88,16 @@ END DO
 
 X(N)=Y(N)/L(N)
 
-DO i=N-1,2,-1
+DO i=N-1,1,-1
 X(i)=(Y(i)-U(i)*X(i+1))/L(i)
 END DO
 
 OPEN(UNIT=1,FILE='Center_D.txt')
-DO i=1,N+1,1
+DO i=1,N,1
 WRITE(1,*) X(i)
 END DO
-RETURN
-END SUBROUTINE 
+!RETURN
+END SUBROUTINE
 
 
 !Upwind Format

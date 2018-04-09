@@ -1,9 +1,9 @@
         !COMPILER-GENERATED INTERFACE MODULE: Mon Apr 09 04:17:26 2018
-        MODULE MIXED_D__genmod
+        MODULE CENTER_FORMAT__genmod
           INTERFACE 
-            SUBROUTINE MIXED_D(N,VELO)
+            SUBROUTINE CENTER_FORMAT(N,VELO)
               INTEGER(KIND=4) :: N
               REAL(KIND=4) :: VELO
-            END SUBROUTINE MIXED_D
+            END SUBROUTINE CENTER_FORMAT
           END INTERFACE 
-        END MODULE MIXED_D__genmod
+        END MODULE CENTER_FORMAT__genmod
