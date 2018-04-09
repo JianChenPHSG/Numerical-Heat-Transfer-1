@@ -16,6 +16,7 @@ READ(*,*)Velo
 CALL Center_Format(N,Velo)
 CALL Center_D(N,Velo)
 CALL Upwind_D(N,Velo)
+CALL Mixed_D(N,Velo)
 !IF (Velo==2.5) THEN
 ! CALL Mixed_D(N,Velo)
 !END IF
@@ -154,7 +155,7 @@ END SUBROUTINE
 SUBROUTINE Mixed_D(N,Velo)
 REAL::Velo
 INTEGER::N
-REAL::Len=1,Dens=1,Gama=0.1,D,F,Delta_x,Fai_0=1,Fai_L=0,Zero=0
+REAL::Len=1,Dens=1,Gama=0.1,D,F,Delta_x,Fai_0=1,Fai_L=0,Zero=0,P=0
 REAL,ALLOCATABLE::A_e(:),A_p(:),A_w(:),X(:),A_c(:),d_(:),c_(:)
 
 
@@ -169,31 +170,54 @@ ALLOCATE(c_(N))
 Delta_x=Len/N
 D=Gama/Delta_x
 F=Dens*Velo 
+P=F/D
+
 !边界条件
-A_e(1)=MAX(-F,D-F/2,Zero)
-A_w(1)=0
-A_p(1)=A_e(1)+MAX(F,2*D+F/2,Zero)
-A_c(1)=(MAX(F,2*D+F/2,Zero))*Fai_0
+!比较糟糕的一种做法，理论上应该一个一个判断
+IF (ABS(P)<2 ) THEN
+    A_e(1)=D-F/2
+    A_w(1)=0
+    A_p(1)=3*D+F/2
+    A_c(1)=(F+2*D)
 
-A_e(N)=0
-A_w(N)=MAX(F,D+F/2,Zero)
-A_p(N)=A_w(N)+MAX(-F,2*D-F/2,Zero)
-A_c(N)=(MAX(-F,2*D-F/2,Zero))*Fai_L
+    A_e(N)=0
+    A_w(N)=D+F/2
+    A_p(N)=3*D-F/2
+    A_c(N)=0
 
+ELSE 
+
+    A_e(1)=D+MAX(-F,Zero)
+    A_w(1)=0
+    A_p(1)=A_e(1)+2*D+MAX(F,Zero)
+    A_c(1)=(2*D+MAX(F,Zero))*Fai_0
+
+    A_e(N)=0
+    A_w(N)=D+MAX(F,Zero)
+    A_p(N)=A_w(N)+2*D+MAX(-F,Zero)
+    A_c(N)=(2*D+MAX(-F,Zero))*Fai_L
+
+END IF
 
 DO i=2,N-1,1
-
-A_e(i)=MAX(-F,D-F/2,Zero)
-A_w(i)=MAX(F,D+F/2,Zero)
-A_p(i)=A_e(i)+A_w(i)
+    IF (ABS(P)<2 ) THEN
+        A_e(i)=(D-F/2)
+        A_w(i)=(D+F/2)
+        A_p(i)=2*D
+        A_c(i)=0
+    ELSE   
+        A_e(i)=D+MAX(-F,Zero)
+        A_w(i)=D+MAX(F,Zero)
+        A_p(i)=A_e(i)+A_w(i)
+        A_c(i)=0
+    END IF
 END DO
 
 
 call TDMA(A_p,A_e,A_w,A_c,N,X)
-write(*,*) A_p,A_e,A_w,A_c,N,X
 
 OPEN(UNIT=1,FILE='Mixed_D.txt')
-DO i=1,N+1,1
+DO i=1,N,1
 WRITE(1,*) X(i)
 END DO
 RETURN
