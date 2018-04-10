@@ -48,9 +48,10 @@ D=Gama/Delta_x
 F=Dens*Velo 
 
 !the coefficient for the left node
+!sencond boundary
 A_e(1)=D-F/2
 A_w(1)=0
-A_p(1)=3*D+F/2
+A_p(1)=3*D
 
 !the coefficient for the middle nodes
 DO i=2,N-1,1
@@ -60,9 +61,10 @@ A_p(i)=A_e(i)+A_w(i)
 END DO
 
 !the coefficient for the right node
-A_e(N)=0
+!second boundary 
+A_e(N)=2*D-F/2
 A_w(N)=D+F/2  
-A_p(N)=3*D-F/2
+A_p(N)=3*D
 
 DO i=1,N,1
 A(i)=-A_w(i)
