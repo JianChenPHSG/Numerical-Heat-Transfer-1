@@ -122,13 +122,13 @@ F=Dens*Velo
 !边界条件
 A_e(1)=D+MAX(-F,Zero)
 A_w(1)=0
-A_p(1)=A_e(1)+2*D+MAX(F,Zero)
-A_c(1)=(2*D+MAX(F,Zero))*Fai_0
+A_p(1)=3*D+MAX(F,Zero)
+A_c(1)=(2*D+F)*Fai_0
 
 A_e(N)=0
 A_w(N)=D+MAX(F,Zero)
-A_p(N)=A_w(N)+2*D+MAX(-F,Zero)
-A_c(N)=(2*D+MAX(-F,Zero))*Fai_L
+A_p(N)=3*D+MAX(-F,Zero)
+A_c(N)=(2*D-F)*Fai_L
 
 
 DO i=2,N-1,1
@@ -189,13 +189,13 @@ ELSE
 
     A_e(1)=D+MAX(-F,Zero)
     A_w(1)=0
-    A_p(1)=A_e(1)+2*D+MAX(F,Zero)
-    A_c(1)=(2*D+MAX(F,Zero))*Fai_0
+    A_p(1)=3*D+MAX(F,Zero)
+    A_c(1)=(2*D+F)*Fai_0
 
     A_e(N)=0
     A_w(N)=D+MAX(F,Zero)
-    A_p(N)=A_w(N)+2*D+MAX(-F,Zero)
-    A_c(N)=(2*D+MAX(-F,Zero))*Fai_L
+    A_p(N)=3*D+MAX(-F,Zero)
+    A_c(N)=(2*D-F)*Fai_L
 
 END IF
 
